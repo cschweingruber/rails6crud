@@ -55,5 +55,5 @@ ENV RAILS_SERVE_STATIC_FILES true
 #ENV EXECJS_RUNTIME Disabled
 EXPOSE 3000
 RUN date -u > /${projectname}/BUILD_TIME
-WORKDIR ${projectname}
+WORKDIR /${projectname}
 CMD ["./startup.sh"]
