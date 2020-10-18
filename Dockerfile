@@ -20,8 +20,8 @@ ENV LC_ALL de_CH.UTF-8
 ENV APP_PATH=/buildroot
 RUN mkdir $APP_PATH
 WORKDIR $APP_PATH
-#COPY Gemfile /$APP_PATH
-#RUN bundle install
+COPY Gemfile /$APP_PATH
+RUN bundle install
 ENV projectname=railsapp
 RUN rails new ${projectname} -d mysql && \
     sed -i "/^gem 'tzinfo-data'/d" Gemfile && \
