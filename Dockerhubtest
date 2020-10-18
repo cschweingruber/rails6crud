@@ -1,3 +1,0 @@
-FROM busybox
-MAINTAINER c.schweingruber@catatec.ch
-RUN echo "hello world"
