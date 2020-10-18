@@ -3,7 +3,7 @@
 .gitignore
 .DS_Store
 README.md
-/Dockerfile
+/Docker
 /env.*
 /log
 /tmp
