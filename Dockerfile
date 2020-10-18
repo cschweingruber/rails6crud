@@ -47,7 +47,7 @@ RUN echo "de_CH.UTF-8 UTF-8" > /etc/locale.gen && \
 ENV LC_ALL de_CH.UTF-8
 #ARG projectname
 COPY --from=RailsDryBuilder /usr/local/bundle /usr/local/bundle
-COPY --from=RailsDryBuilder /app/${projectname} /${projectname}
+COPY --from=RailsDryBuilder /buildroot/${projectname} /${projectname}
 ADD startup.sh /${projectname}
 RUN chmod 755  /${projectname}/startup.sh
 ENV RAILS_LOG_TO_STDOUT true
