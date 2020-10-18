@@ -34,6 +34,7 @@ RUN cd ${projectname}; echo "gem 'dry_crud'" >> Gemfile; gem install dry_crud; b
 
 ARG RUBY_VERSION=2.7.2
 FROM ruby:$RUBY_VERSION
+ARG projectname=railsapp
 RUN apt-get update -qq \
  && apt-get install -y --no-install-recommends build-essential \
     apt-transport-https curl ca-certificates gnupg2 apt-utils && \
