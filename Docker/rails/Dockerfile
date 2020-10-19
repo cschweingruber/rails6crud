@@ -28,6 +28,7 @@ COPY Gemfile /$APP_PATH
 RUN bundle install
 ENV projectname=railsapp
 RUN rails new ${projectname} -d mysql && \
+    cd ${projectname} && \
     sed -i "/^gem 'tzinfo-data'/d" Gemfile && \
     sed -i "/^# Windows does not include zoneinfo/d" Gemfile 
 RUN cd ${projectname}; echo "gem 'dry_crud'" >> Gemfile; gem install dry_crud; bundle install;
