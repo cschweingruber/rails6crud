@@ -5,17 +5,29 @@ MAINTAINER c.schweingruber@catatec.ch
 ARG APP_PATH=/buildroot
 ARG projectname=railsapp
 
-RUN apt-get update -qq \
- && apt-get install -y --no-install-recommends build-essential \
-    apt-transport-https curl ca-certificates gnupg2 apt-utils && \
-    curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - && \
-    echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list && \
-    curl -sL https://deb.nodesource.com/setup_10.x | bash -  && \
-  apt-get update -qq && apt-get install -y --no-install-recommends nodejs mariadb-client vim && \
-  apt-get install -y yarn && \
-  apt-get install -y imagemagick && \
-  apt-get install -y libvips-tools && \
-  apt-get install -y locales
+#ARG RAILS_ROOT=/app
+ARG BUILD_PACKAGES="build-base curl-dev git"
+ARG DEV_PACKAGES="postgresql-dev yaml-dev zlib-dev nodejs yarn"
+ARG RUBY_PACKAGES="tzdata"
+#ENV RAILS_ENV=production
+#ENV NODE_ENV=production
+#ENV BUNDLE_APP_CONFIG="$RAILS_ROOT/.bundle"
+#WORKDIR $RAILS_ROOT
+# install packages
+RUN apk update \
+    && apk upgrade \
+    && apk add --update --no-cache $BUILD_PACKAGES $DEV_PACKAGES $RUBY_PACKAGES
+COPY Gemfile* package.json yarn.lock ./
+# install rubygem
+COPY Gemfile Gemfile.lock $RAILS_ROOT/
+RUN bundle config --global frozen 1 \
+    && bundle install --without development:test:assets -j4 --retry 3 --path=vendor/bundle \
+    # Remove unneeded files (cached *.gem, *.o, *.c)
+    && rm -rf vendor/bundle/ruby/2.5.0/cache/*.gem \
+    && find vendor/bundle/ruby/2.5.0/gems/ -name "*.c" -delete \
+    && find vendor/bundle/ruby/2.5.0/gems/ -name "*.o" -delete
+RUN yarn install --production
+
 
 RUN echo "de_CH.UTF-8 UTF-8" > /etc/locale.gen && \
   locale-gen de_CH.UTF-8 && \
@@ -27,6 +39,7 @@ WORKDIR $APP_PATH
 COPY Gemfile /$APP_PATH
 RUN bundle install
 RUN rails new ${projectname} -d mysql && \
+    cd ${projectname} && \
     sed -i "/^gem 'tzinfo-data'/d" Gemfile && \
     sed -i "/^# Windows does not include zoneinfo/d" Gemfile 
 RUN cd ${projectname}; echo "gem 'dry_crud'" >> Gemfile; gem install dry_crud; bundle install;
@@ -37,17 +50,6 @@ MAINTAINER c.schweingruber@catatec.ch
 ARG APP_PATH=/buildroot
 ARG projectname=railsapp
 
-RUN apt-get update -qq \
- && apt-get install -y --no-install-recommends build-essential \
-    apt-transport-https curl ca-certificates gnupg2 apt-utils && \
-    curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - && \
-    echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list && \
-    curl -sL https://deb.nodesource.com/setup_10.x | bash -  && \
-  apt-get update -qq && apt-get install -y --no-install-recommends nodejs mariadb-client vim && \
-  apt-get install -y yarn && \
-  apt-get install -y imagemagick && \
-  apt-get install -y libvips-tools && \
-  apt-get install -y locales
 
 RUN echo "de_CH.UTF-8 UTF-8" > /etc/locale.gen && \
   locale-gen de_CH.UTF-8 && \
