@@ -17,7 +17,7 @@ ARG RUBY_PACKAGES="tzdata"
 RUN apk update \
     && apk upgrade \
     && apk add --update --no-cache $BUILD_PACKAGES $DEV_PACKAGES $RUBY_PACKAGES
-COPY Gemfile* package.json yarn.lock ./
+#COPY Gemfile* package.json yarn.lock ./
 # install rubygem
 COPY Gemfile Gemfile.lock $RAILS_ROOT/
 RUN bundle config --global frozen 1 \
